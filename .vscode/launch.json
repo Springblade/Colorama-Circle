@@ -1,0 +1,32 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "ShapeDiceTest",
+            "request": "launch",
+            "mainClass": "core.ShapeDiceTest",
+            "projectName": "Colorama-Circle_3a0e76aa"
+        },
+        {
+            "type": "java",
+            "name": "ColorDiceTest",
+            "request": "launch",
+            "mainClass": "core.ColorDiceTest",
+            "projectName": "Colorama-Circle_3a0e76aa"
+        },
+        {
+            "type": "java",
+            "name": "ColorDiceTest",
+            "request": "launch",
+            "mainClass": "core.ColorDiceTest",
+            "projectName": "Colorama-Circle"
+        },
+        {
+            "type": "java",
+            "name": "ColorDice",
+            "request": "launch",
+            "mainClass": "core.ColorDice",
+            "projectName": "Colorama-Circle"
+        }
+    ]
+}
