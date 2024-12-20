@@ -8,6 +8,16 @@ public class GamePiece {
         this.shape = cell.shape.toString();
     }
 
+    // Getter for color
+    public String getColor() {
+        return color;
+    }
+
+    // Getter for shape
+    public String getShape() {
+        return shape;
+    }
+
     public void displayPiece() {
         System.out.println("Piece - Color: " + color + ", Shape: " + shape);
     }
