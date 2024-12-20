@@ -1,28 +1,23 @@
-public class GamePiece {
-    // Constructor that accepts a cell
-    private String color;
-    private String shape;
-
-    public GamePiece(Broad.Cell cell) {
-        this.color = cell.color;
-        this.shape = cell.shape.toString();
-    }
-
-    public void displayPiece() {
-        System.out.println("Piece - Color: " + color + ", Shape: " + shape);
-    }
-
+public class GamePieceTest {
     public static void main(String[] args) {
-        // Get the grid from Broad
+        // Fetch the grid from Broad
         Broad.Cell[][] grid = Broad.getGrid();
 
-        // Create GamePieces based on the grid
+        // Test the creation of GamePieces and their display
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                // Create GamePiece for each cell in the grid
-                GamePiece piece = new GamePiece(grid[i][j]);
-                piece.displayPiece(); // Display piece details
+                Broad.Cell cell = grid[i][j];
+                GamePiece piece = new GamePiece(cell);
+
+                // Verify the piece's properties match the cell
+                assert piece != null : "GamePiece should not be null";
+                assert cell.color.equals(piece.getColor()) : 
+                    "GamePiece color mismatch. Expected: " + cell.color + ", Found: " + piece.getColor();
+                assert cell.shape.toString().equals(piece.getShape()) : 
+                    "GamePiece shape mismatch. Expected: " + cell.shape + ", Found: " + piece.getShape();
             }
         }
+
+        System.out.println("GamePieceTest passed!");
     }
 }
