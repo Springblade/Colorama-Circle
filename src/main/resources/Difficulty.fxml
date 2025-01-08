@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.effect.DropShadow?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="main.DifficultyController"
+           style="-fx-background-color: white;">
+    <VBox spacing="20" alignment="CENTER">
+        <Button text="LEVEL 1" onAction="#handleEasy"
+                style="-fx-min-width: 200; -fx-min-height: 40;
+                       -fx-background-color: #4CAF50; -fx-text-fill: white;
+                       -fx-font-size: 18px; -fx-background-radius: 20;">
+            <effect>
+                <DropShadow/>
+            </effect>
+        </Button>
+        <Button text="LEVEL 2" onAction="#handleMedium"
+                style="-fx-min-width: 200; -fx-min-height: 40;
+                       -fx-background-color: #FFA500; -fx-text-fill: white;
+                       -fx-font-size: 18px; -fx-background-radius: 20;">
+            <effect>
+                <DropShadow/>
+            </effect>
+        </Button>
+        <Button text="LEVEL 3" onAction="#handleHard"
+                style="-fx-min-width: 200; -fx-min-height: 40;
+                       -fx-background-color: #f44336; -fx-text-fill: white;
+                       -fx-font-size: 18px; -fx-background-radius: 20;">
+            <effect>
+                <DropShadow/>
+            </effect>
+        </Button>
+    </VBox>
+</StackPane>

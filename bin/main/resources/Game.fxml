@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<BorderPane fx:id="mainLayout" fx:controller="main.GameController" xmlns:fx="http://javafx.com/fxml">
+    <top>
+        <MenuBar>
+            <menus>
+                <Menu text="Options">
+                    <items>
+                        <MenuItem text="New Game" onAction="#handleNewGame"/>
+                        <MenuItem text="Back" onAction="#handleBackToDifficulty"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    
+    <center>
+        <BorderPane>
+            <top>
+                <VBox fx:id="topContainer" alignment="CENTER">
+                    <padding>
+                        <Insets top="20" bottom="20"/>
+                    </padding>
+                </VBox>
+            </top>
+            
+            <center>
+                <HBox alignment="CENTER">
+                    <VBox fx:id="leftContainer" alignment="CENTER">
+                        <padding>
+                            <Insets left="20" right="20"/>
+                        </padding>
+                    </VBox>
+                    
+                    <GridPane fx:id="board" alignment="CENTER" styleClass="game-board">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                    </GridPane>
+                    
+                    <VBox fx:id="rightContainer" alignment="CENTER">
+                        <padding>
+                            <Insets left="20" right="20"/>
+                        </padding>
+                    </VBox>
+                </HBox>
+            </center>
+            
+            <bottom>
+                <VBox fx:id="bottomContainer" alignment="CENTER">
+                    <padding>
+                        <Insets top="20" bottom="20"/>
+                    </padding>
+                </VBox>
+            </bottom>
+        </BorderPane>
+    </center>
+</BorderPane>

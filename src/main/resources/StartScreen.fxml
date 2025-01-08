@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="main.StartScreenController" 
+           style="-fx-background-color: white;">
+    <VBox spacing="0" alignment="TOP_CENTER">
+        <!-- Menu Bar -->
+        <MenuBar>
+            <menus>
+                <Menu text="Options">
+                    <items>
+                        <MenuItem text="Quit" onAction="#handleQuit"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        
+        <!-- Main Content -->
+        <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+            <Button text="PLAY" onAction="#handlePlayButton" 
+                    style="-fx-min-width: 300; -fx-min-height: 60; 
+                           -fx-background-color: #4CAF50; -fx-text-fill: white;
+                           -fx-font-size: 28px; -fx-font-weight: bold;
+                           -fx-background-radius: 30;
+                           -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);">
+                <VBox.margin>
+                    <Insets bottom="20"/>
+                </VBox.margin>
+            </Button>
+            
+            <Button text="QUIT" onAction="#handleQuit"
+                    style="-fx-min-width: 300; -fx-min-height: 60;
+                           -fx-background-color: #f44336; -fx-text-fill: white;
+                           -fx-font-size: 28px; -fx-font-weight: bold;
+                           -fx-background-radius: 30;
+                           -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);">
+            </Button>
+        </VBox>
+    </VBox>
+</StackPane>
