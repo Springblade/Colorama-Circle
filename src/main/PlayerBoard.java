@@ -1,6 +1,5 @@
 package main;
 
-import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -10,7 +9,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 
 public class PlayerBoard extends FlowPane {
@@ -46,9 +44,7 @@ public class PlayerBoard extends FlowPane {
             this.setPrefWrapLength(USE_PREF_SIZE);
             this.setHgap(5);
             this.setVgap(2);
-        }
-        
-        // Ensure proper alignment
+        }       
         this.setRowValignment(VPos.CENTER);
         this.setColumnHalignment(HPos.CENTER);
     }
@@ -128,17 +124,36 @@ public class PlayerBoard extends FlowPane {
 
     private void makeDraggable(Shape piece, Color color, ShapeType shapeType) {
         final Delta dragDelta = new Delta();
-        final Bounds[] originalBounds = new Bounds[1];  // Array to hold reference
+    
+        // Set up hover effect
+        piece.setOnMouseEntered(e -> {
+            if (isCurrentTurn) {
+                piece.setCursor(javafx.scene.Cursor.HAND);
+                piece.setEffect(new DropShadow(6, Color.GOLD));
+            }
+        });
+    
+        piece.setOnMouseExited(e -> {
+            if (isCurrentTurn && !piece.isPressed()) {
+                piece.setEffect(new DropShadow(4, Color.gray(0.3, 0.5)));
+            }
+        });
     
         piece.setOnMousePressed(event -> {
             if (!isCurrentTurn) {
                 event.consume();
                 return;
             }
-            // Store original bounds before drag
-            originalBounds[0] = piece.localToScene(piece.getBoundsInLocal());
-            dragDelta.mouseX = event.getSceneX() - originalBounds[0].getMinX();
-            dragDelta.mouseY = event.getSceneY() - originalBounds[0].getMinY();
+    
+            // Record initial mouse position relative to piece's parent
+            dragDelta.mouseX = event.getSceneX();
+            dragDelta.mouseY = event.getSceneY();
+    
+            // Record the initial position of the piece
+            dragDelta.initialTranslateX = piece.getTranslateX();
+            dragDelta.initialTranslateY = piece.getTranslateY();
+    
+            // Visual feedback for dragging
             piece.setOpacity(0.7);
             piece.toFront();
             piece.setEffect(new DropShadow(8, Color.GOLD));
@@ -150,26 +165,15 @@ public class PlayerBoard extends FlowPane {
                 event.consume();
                 return;
             }
-            
-            double newX = event.getSceneX() - dragDelta.mouseX;
-            double newY = event.getSceneY() - dragDelta.mouseY;
     
-            // Get the scene bounds
-            Scene scene = getScene();
-            double sceneWidth = scene.getWidth();
-            double sceneHeight = scene.getHeight();
-            
-            // Calculate piece dimensions
-            double pieceWidth = piece.getBoundsInLocal().getWidth();
-            double pieceHeight = piece.getBoundsInLocal().getHeight();
+            // Calculate the distance moved from the initial press
+            double deltaX = event.getSceneX() - dragDelta.mouseX;
+            double deltaY = event.getSceneY() - dragDelta.mouseY;
     
-            // Constrain to scene bounds
-            newX = Math.max(0, Math.min(sceneWidth - pieceWidth, newX));
-            newY = Math.max(0, Math.min(sceneHeight - pieceHeight, newY));
+            // Update position relative to the initial position
+            piece.setTranslateX(dragDelta.initialTranslateX + deltaX);
+            piece.setTranslateY(dragDelta.initialTranslateY + deltaY);
     
-            // Update position
-            piece.setTranslateX(newX - piece.getLayoutX());
-            piece.setTranslateY(newY - piece.getLayoutY());
             event.consume();
         });
     
@@ -178,14 +182,15 @@ public class PlayerBoard extends FlowPane {
                 event.consume();
                 return;
             }
+    
             piece.setOpacity(1.0);
-            
-            // Try to place the piece for Level 1
+    
+            // Try to place the piece based on difficulty level
             if ("LEVEL 1".equals(gameController.getDifficulty())) {
                 if (gameController.tryPlacePiece(event.getSceneX(), event.getSceneY(), color, shapeType)) {
                     this.getChildren().remove(piece);
                 } else {
-                    // Reset to original position if placement fails
+                    // Reset position if placement fails
                     piece.setTranslateX(0);
                     piece.setTranslateY(0);
                 }
@@ -194,16 +199,17 @@ public class PlayerBoard extends FlowPane {
                 if (gameController.tryPickPiece(event.getSceneX(), event.getSceneY(), gameController.getRolledColor())) {
                     this.getChildren().remove(piece);
                 } else {
-                    // Reset to original position if picking fails
+                    // Reset position if picking fails
                     piece.setTranslateX(0);
                     piece.setTranslateY(0);
                 }
             }
+                
             piece.setEffect(new DropShadow(4, Color.gray(0.3, 0.5)));
             event.consume();
         });
     }
-
+    
     public void setCurrentTurn(boolean isCurrentTurn) {
         this.isCurrentTurn = isCurrentTurn;
         if (isCurrentTurn) {
@@ -230,5 +236,7 @@ public class PlayerBoard extends FlowPane {
     private static class Delta {
         double mouseX = 0;
         double mouseY = 0;
+        double initialTranslateX;
+        double initialTranslateY;
     }
 }

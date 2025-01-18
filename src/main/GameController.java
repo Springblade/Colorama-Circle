@@ -16,7 +16,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import java.util.*;
@@ -32,6 +31,8 @@ public class GameController {
     @FXML private VBox leftContainer;
     @FXML private VBox rightContainer;
     @FXML private VBox bottomContainer;
+    @FXML private VBox farLeftContainer; 
+    @FXML private VBox farRightContainer;
     @FXML private Label diceRollResultLabel;
 
     private final int rows = 5;
@@ -122,10 +123,7 @@ public class GameController {
         if (("LEVEL 2").equals(difficulty)) {
             generateFilledGameBoard();
             initializePlayerBoards();
-        }
-
-        
-       
+        }       
     }
 
     private void initializePlayerBoards() {
@@ -133,6 +131,8 @@ public class GameController {
         leftContainer.getChildren().clear();
         rightContainer.getChildren().clear();
         bottomContainer.getChildren().clear();
+        farLeftContainer.getChildren().clear();
+        farRightContainer.getChildren().clear();
         
         // Player 1 (Bottom)
         PlayerBoard player1Board = new PlayerBoard(this);
@@ -142,18 +142,18 @@ public class GameController {
         VBox player1Container = createPlayerContainer(player1Board, "PLAYER 1", false);
         bottomContainer.getChildren().add(player1Container);
         playerBoards.add(player1Board);
-
+    
         if (numberOfPlayers >= 2) {
             // Player 2 (Left)
             PlayerBoard player2Board = new PlayerBoard(this);
             player2Board.customizeOrientation(Orientation.VERTICAL);
-            player2Board.setPrefSize(120, sceneHeight * 0.4);
-            player2Board.setMaxSize(120, sceneHeight * 0.4);
+            player2Board.setPrefSize(150, sceneHeight * 0.4);
+            player2Board.setMaxSize(150, sceneHeight * 0.4);
             VBox player2Container = createPlayerContainer(player2Board, "PLAYER 2", false);
             leftContainer.getChildren().add(player2Container);
             playerBoards.add(player2Board);
         }
-
+    
         if (numberOfPlayers >= 3) {
             // Player 3 (Top)
             PlayerBoard player3Board = new PlayerBoard(this);
@@ -164,38 +164,39 @@ public class GameController {
             topContainer.getChildren().add(player3Container);
             playerBoards.add(player3Board);
         }
-
+    
         if (numberOfPlayers >= 4) {
             // Player 4 (Right)
             PlayerBoard player4Board = new PlayerBoard(this);
             player4Board.customizeOrientation(Orientation.VERTICAL);
-            player4Board.setPrefSize(120, sceneHeight * 0.4);
-            player4Board.setMaxSize(120, sceneHeight * 0.4);
+            player4Board.setPrefSize(150, sceneHeight * 0.4);
+            player4Board.setMaxSize(150, sceneHeight * 0.4);
             VBox player4Container = createPlayerContainer(player4Board, "PLAYER 4", false);
             rightContainer.getChildren().add(player4Container);
             playerBoards.add(player4Board);
         }
+    
         if (numberOfPlayers >= 5) {
-            // Player 5 (Next to the right of player 2)
+            // Player 5 (Far left)
             PlayerBoard player5Board = new PlayerBoard(this);
             player5Board.customizeOrientation(Orientation.VERTICAL);
-            player5Board.setPrefSize(120, sceneHeight * 0.4);
-            player5Board.setMaxSize(120, sceneWidth * 0.4);
+            player5Board.setPrefSize(150, sceneHeight * 0.4);
+            player5Board.setMaxSize(150, sceneHeight * 0.4);
             VBox player5Container = createPlayerContainer(player5Board, "PLAYER 5", false);
-            
+            farLeftContainer.getChildren().add(player5Container);
+            playerBoards.add(player5Board);
         }
-
-        leftContainer.setPadding(new Insets(0, 20, 0, 20));  // Horizontal
-        rightContainer.setPadding(new Insets(0, 20, 0, 20)); // Horizontal 
-        topContainer.setPadding(new Insets(20, 0, 20, 0));   // Vertical 
-        bottomContainer.setPadding(new Insets(20, 0, 20, 0)); // Vertical
-        
-        leftContainer.setPrefWidth(sceneWidth * 0.2);   
-        rightContainer.setPrefWidth(sceneWidth * 0.2);  
-        topContainer.setPrefHeight(sceneHeight * 0.2);  
-        bottomContainer.setPrefHeight(sceneHeight * 0.2); 
-
-        // Set initial turn
+    
+        if (numberOfPlayers >= 6) {
+            // Player 6 (Far right)
+            PlayerBoard player6Board = new PlayerBoard(this);
+            player6Board.customizeOrientation(Orientation.VERTICAL);
+            player6Board.setPrefSize(150, sceneHeight * 0.4);
+            player6Board.setMaxSize(150, sceneHeight * 0.4);
+            VBox player6Container = createPlayerContainer(player6Board, "PLAYER 6", false);
+            farRightContainer.getChildren().add(player6Container);
+            playerBoards.add(player6Board);
+        }
         playerBoards.get(0).setCurrentTurn(true);
     }
 

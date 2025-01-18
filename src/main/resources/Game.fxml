@@ -2,60 +2,96 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.*?>
-<BorderPane fx:id="mainLayout" fx:controller="main.GameController" xmlns:fx="http://javafx.com/fxml">
-    <top>
-        <MenuBar>
-            <menus>
-                <Menu text="Options">
-                    <items>
-                        <MenuItem text="New Game" onAction="#handleNewGame"/>
-                        <MenuItem text="Back" onAction="#handleBackToDifficulty"/>
-                    </items>
-                </Menu>
-            </menus>
-        </MenuBar>
-    </top>
-    
-    <center>
-        <BorderPane>
-            <top>
-                <VBox fx:id="topContainer" alignment="CENTER">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="main.GameController">
+   
+    <MenuBar>
+        <menus>
+            <Menu text="Options">
+                <items>
+                    <MenuItem text="New Game" onAction="#handleNewGame"/>
+                    <MenuItem text="Back" onAction="#handleBackToDifficulty"/>
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
+   
+    <BorderPane fx:id="mainLayout" VBox.vgrow="ALWAYS">
+        <top>
+            <VBox alignment="CENTER" spacing="10">
+                <Label fx:id="diceRollResultLabel" 
+                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                <VBox fx:id="topContainer" alignment="CENTER" prefHeight="140">
                     <padding>
-                        <Insets top="20" bottom="20"/>
+                        <Insets top="20" bottom="20" left="20" right="20"/>
                     </padding>
-                    <Label fx:id="diceRollResultLabel" text="Dice Roll Result" />
+                    <BorderPane.margin>
+                        <Insets bottom="20"/>
+                    </BorderPane.margin>
                 </VBox>
-            </top>
-            
-            <center>
-                <HBox alignment="CENTER">
-                    <VBox fx:id="leftContainer" alignment="CENTER">
-                        <padding>
-                            <Insets left="20" right="20"/>
-                        </padding>
-                    </VBox>
-                    
-                    <GridPane fx:id="board" alignment="CENTER" styleClass="game-board">
-                        <padding>
-                            <Insets top="20" right="20" bottom="20" left="20"/>
-                        </padding>
-                    </GridPane>
-                    
-                    <VBox fx:id="rightContainer" alignment="CENTER">
-                        <padding>
-                            <Insets left="20" right="20"/>
-                        </padding>
-                    </VBox>
-                </HBox>
-            </center>
-            
-            <bottom>
-                <VBox fx:id="bottomContainer" alignment="CENTER">
+            </VBox>
+        </top>
+           
+        <center>
+            <HBox alignment="CENTER">
+                <!-- Far Left Container for Player 5 -->
+                <VBox fx:id="farLeftContainer" alignment="CENTER" prefWidth="100" maxWidth="100">
                     <padding>
-                        <Insets top="20" bottom="20"/>
+                        <Insets top="20" bottom="20" left="10" right="10"/>
                     </padding>
+                    <HBox.margin>
+                        <Insets right="40"/>
+                    </HBox.margin>
                 </VBox>
-            </bottom>
-        </BorderPane>
-    </center>
-</BorderPane>
+                
+                <!-- Left Container for Player 2 -->
+                <VBox fx:id="leftContainer" alignment="CENTER" prefWidth="100" maxWidth="100">
+                    <padding>
+                        <Insets top="20" bottom="20" left="10" right="10"/>
+                    </padding>
+                    <HBox.margin>
+                        <Insets right="60"/>
+                    </HBox.margin>
+                </VBox>
+                
+                <!-- Game Board -->
+                <GridPane fx:id="board" alignment="CENTER" styleClass="game-board">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                </GridPane>
+                
+                <!-- Right Container for Player 4 -->
+                <VBox fx:id="rightContainer" alignment="CENTER" prefWidth="100" maxWidth="100">
+                    <padding>
+                        <Insets top="20" bottom="20" left="10" right="10"/>
+                    </padding>
+                    <HBox.margin>
+                        <Insets left="60"/>
+                    </HBox.margin>
+                </VBox>
+                
+                <!-- Far Right Container for Player 6 -->
+                <VBox fx:id="farRightContainer" alignment="CENTER" prefWidth="100" maxWidth="100">
+                    <padding>
+                        <Insets top="20" bottom="20" left="10" right="10"/>
+                    </padding>
+                    <HBox.margin>
+                        <Insets left="40"/>
+                    </HBox.margin>
+                </VBox>
+            </HBox>
+        </center>
+           
+        <bottom>
+            <VBox fx:id="bottomContainer" alignment="CENTER" prefHeight="140">
+                <padding>
+                    <Insets top="20" bottom="20" left="20" right="20"/>
+                </padding>
+                <BorderPane.margin>
+                    <Insets top="20"/>
+                </BorderPane.margin>
+            </VBox>
+        </bottom>
+    </BorderPane>
+</VBox>
