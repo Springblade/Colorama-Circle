@@ -1,13 +1,16 @@
+
 {
     "version": "0.2.0",
     "configurations": [
+    
         {
             "type": "java",
             "name": "App",
             "request": "launch",
             "mainClass": "main.App",
-            "vmArgs": "--module-path \"C:/Users/wayad/Documents/JAVAFX/javafx-sdk-17.0.13/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.media,javafx.web",
-            "projectName": "Colorama-Circle_3d28692"
+            "vmArgs": "--module-path \"C:/Users/kathm/Documents/JAVAFX_17.0.13/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.media,javafx.web",
+            
         }
     ]
 }
+

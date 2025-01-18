@@ -23,6 +23,7 @@
                     <padding>
                         <Insets top="20" bottom="20"/>
                     </padding>
+                    <Label fx:id="diceRollResultLabel" text="Dice Roll Result" />
                 </VBox>
             </top>
             

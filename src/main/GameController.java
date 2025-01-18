@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label; 
 import javafx.scene.control.MenuItem;
@@ -31,6 +32,7 @@ public class GameController {
     @FXML private VBox leftContainer;
     @FXML private VBox rightContainer;
     @FXML private VBox bottomContainer;
+    @FXML private Label diceRollResultLabel;
 
     private final int rows = 5;
     private final int cols = 8;
@@ -40,9 +42,20 @@ public class GameController {
     private int numberOfPlayers;
     private List<PlayerBoard> playerBoards = new ArrayList<>();
     private int currentPlayer = 0;
-    private List<Color> colors = Arrays.asList(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
     private List<ShapeType> shapes = Arrays.asList(ShapeType.values());
     private int maxRetries = 100;
+    private Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
+    private Random random = new Random();
+    private Color rolledColor;
+    private boolean isJoker = false;
+        
+
+    private Map<Color, String> colorNames = Map.of(
+        Color.RED, "Red",
+        Color.GREEN, "Green",
+        Color.BLUE, "Blue",
+        Color.YELLOW, "Yellow"
+    );
 
     public GameController() {
         sceneWidth = 1024;
@@ -98,9 +111,21 @@ public class GameController {
         leftContainer.setPadding(new Insets(10));
         rightContainer.setPadding(new Insets(10));
         
-        generateGameBoard();
-        initializePlayerBoards();
-        distributePieces();
+
+        // Initialize game based on difficulty and player count
+        if("LEVEL 1". equals(difficulty)){
+            generateEmptyGameBoard();
+            initializePlayerBoards();
+            distributePieces();
+        }
+
+        if (("LEVEL 2").equals(difficulty)) {
+            generateFilledGameBoard();
+            initializePlayerBoards();
+        }
+
+        
+       
     }
 
     private void initializePlayerBoards() {
@@ -216,7 +241,7 @@ public class GameController {
         }
     }
 
-    private void generateGameBoard() {
+    private void generateEmptyGameBoard() {
         board.getChildren().clear();
         
         // First set a fixed size for the board
@@ -233,7 +258,7 @@ public class GameController {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 CellContent content = boardCells.get(index++);
-                GameBoardCell cell = new GameBoardCell(content.color, content.shape);
+                GameBoardCell cell = new GameBoardCell(content.color, content.shape, "LEVEL 1");
                 cell.setPrefSize(60, 60);
                 cell.setMinSize(60, 60);
                 cell.setMaxSize(60, 60);
@@ -245,6 +270,37 @@ public class GameController {
         System.out.println("Generated board with " + board.getChildren().size() + " cells");
         System.out.println("Expected cells: " + (rows * cols));
     }
+
+    private void generateFilledGameBoard() {
+        board.getChildren().clear();
+        
+        // First set a fixed size for the board
+        board.setPrefSize(cols * 65, rows * 65);
+        board.setMinSize(cols * 65, rows * 65);
+        
+        List<CellContent> boardCells = generateValidBoard();
+        if (boardCells == null || boardCells.size() != rows * cols) {
+            showErrorAlert("Board Generation Error", "Failed to generate a valid board. Please try again.");
+            return;
+        }
+    
+        int index = 0;
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                CellContent content = boardCells.get(index++);
+                GameBoardCell cell = new GameBoardCell(content.color, content.shape, "LEVEL 2");
+                cell.setPrefSize(60, 60);
+                cell.setMinSize(60, 60);
+                cell.setMaxSize(60, 60);
+                board.add(cell, col, row);
+            }
+        }
+    
+        // Print debug info
+        System.out.println("Generated board with " + board.getChildren().size() + " cells");
+        System.out.println("Expected cells: " + (rows * cols));
+    }
+   
 
     private List<CellContent> generateValidBoard() {
         for (int attempt = 0; attempt < maxRetries; attempt++) {
@@ -360,7 +416,7 @@ public class GameController {
                     if (cell.isEmpty() && cell.matches(new GamePiece(pieceColor, pieceShape))) {
                         cell.placePiece(new GamePiece(pieceColor, pieceShape));
                         nextTurn();
-                        checkGameEnd();
+                        checkGameEnd1();
                         return true;
                     }
                 }
@@ -369,19 +425,61 @@ public class GameController {
         return false;
     }
 
+    // LEVEL 2
+public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
+        // Convert scene coordinates to board coordinates
+        Node boardNode = board;
+        double localX = boardNode.sceneToLocal(sceneX, sceneY).getX();
+        double localY = boardNode.sceneToLocal(sceneX, sceneY).getY();
+    
+        // Check if the pick location is within the board bounds
+        if (!board.getBoundsInLocal().contains(localX, localY)) {
+            return false;
+        }
+    
+        // Find the cell at pick location
+        for (Node node : board.getChildren()) {
+            if (node instanceof GameBoardCell cell) {
+                if (cell.getBoundsInParent().contains(localX, localY)) {
+                    // If rolledColor is null, allow picking any piece (joker case)
+                    if (!cell.isEmpty() && (rolledColor == null || cell.matchesColor(rolledColor))) {
+                        cell.removePiece();
+                        checkGameEnd2(); // check if the game has ended
+                        nextTurn();
+                        return true;
+                    } else {
+                        // Provide feedback for picking the wrong piece
+                        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
+                        System.out.println("Picked wrong color. Lose a turn.");
+                        nextTurn();
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     private void nextTurn() {
+        // End the current player's turn
         playerBoards.get(currentPlayer).setCurrentTurn(false);
+        
+        // Advance to the next player
         currentPlayer = (currentPlayer + 1) % numberOfPlayers;
+        
+        // Start the next player's turn
         playerBoards.get(currentPlayer).setCurrentTurn(true);
         
+        // Update the visual style of the player boards
         for (int i = 0; i < playerBoards.size(); i++) {
             PlayerBoard board = playerBoards.get(i);
             board.setStyle("-fx-border-color: " + (i == currentPlayer ? "gold" : "#cccccc") + 
                           "; -fx-border-width: " + (i == currentPlayer ? "3" : "2") + ";");
         }
+        
+    
     }
 
-    private void checkGameEnd() {
+    private void checkGameEnd1() {
         boolean boardFull = true;
         for (Node node : board.getChildren()) {
             if (node instanceof GameBoardCell cell && cell.isEmpty()) {
@@ -391,16 +489,40 @@ public class GameController {
         }
 
         if (boardFull) {
-            showGameWonDialog();
+            showGameWonDialog1();
         }
     }
 
-    private void showGameWonDialog() {
+    private void showGameWonDialog1() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Congratulations!");
         alert.setHeaderText("All pieces have been matched correctly!");
         alert.showAndWait();
     }
+
+
+    private void checkGameEnd2() {
+        boolean boardEmpty = true;
+        for (Node node : board.getChildren()) {
+            if (node instanceof GameBoardCell cell && !cell.isEmpty()) {
+                boardEmpty = false;
+                break;
+            }
+        }
+    
+        if (boardEmpty) {
+            showGameWonDialog2();
+        }
+    }
+
+    private void showGameWonDialog2() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Congratulations!");
+        alert.setHeaderText("All pieces have been picked correctly!");
+        alert.showAndWait();
+    }
+
+
 
     @FXML
     private void handleNewGame() {
@@ -409,12 +531,18 @@ public class GameController {
             sceneWidth = currentScene.getWidth();
             sceneHeight = currentScene.getHeight();
         }
-        
+    
         currentPlayer = 0;
-        generateGameBoard();
         playerBoards.clear();
-        initializePlayerBoards();
-        distributePieces();
+    
+        if ("LEVEL 1".equals(difficulty)) {
+            generateEmptyGameBoard();
+            initializePlayerBoards();
+            distributePieces();
+        } else if ("LEVEL 2".equals(difficulty)) {
+            generateFilledGameBoard();
+            initializePlayerBoards();
+        }
     }
 
     @FXML
@@ -444,4 +572,79 @@ public class GameController {
             this.shape = shape;
         }
     }
+
+    public void handleDiceRoll() {
+        int roll = random.nextInt(6); // Simulate a dice roll (0-5)
+        rolledColor = null;
+        isJoker = false; // Reset isJoker at the start of each dice roll
+
+        if (roll < 4) {
+            rolledColor = colors[roll];
+            String colorName = colorNames.get(rolledColor);
+            diceRollResultLabel.setText("Rolled color: " + colorName);
+            System.out.println("Rolled color: " + colorName);
+        } else if (roll == 4) {
+            diceRollResultLabel.setText("Rolled blank. Lose a turn.");
+            System.out.println("Rolled blank. Lose a turn.");
+            nextTurn();
+            return;
+        } else if (roll == 5) {
+            isJoker = true;
+            diceRollResultLabel.setText("Rolled lucky joker. Pick any piece.");
+            System.out.println("Rolled lucky joker. Pick any piece.");
+        }
+
+        // Allow player to pick a piece based on the rolled color or joker
+        for (GameBoardCell cell : getAllCells()) {
+            if (isJoker || cell.matchesColor(rolledColor)) {
+                cell.highlightAsValidTarget();
+                cell.setOnMouseClicked(e -> {
+                    if (isJoker || cell.matchesColor(rolledColor)) {
+                        cell.removePiece();
+                        if (isJoker) {
+                            System.out.println("Picked correct piece (joker).");
+                        } else {
+                            String colorName = colorNames.get(rolledColor);
+                            System.out.println("Picked correct color: " + colorName);
+                        }
+                        checkGameEnd2();
+                        removeHighlights();
+                        nextTurn();
+                    } else {
+                        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
+                        System.out.println("Picked wrong color. Lose a turn.");
+                        removeHighlights();
+                        nextTurn();
+                    }
+                });
+            }
+        }
+    }
+
+  private List<GameBoardCell> getAllCells() {
+        List<GameBoardCell> cells = new ArrayList<>();
+        for (Node node : board.getChildren()) {
+            if (node instanceof GameBoardCell) {
+                cells.add((GameBoardCell) node);
+            }
+        }
+        return cells;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+  
+
+    public Color getRolledColor() {
+        return rolledColor;
+    }
+
+    public void removeHighlights() {
+        for (GameBoardCell cell : getAllCells()) {
+            cell.removeHighlight();
+        }
+    }
+
 }

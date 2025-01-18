@@ -25,8 +25,11 @@ public class DifficultyController {
     
     @FXML
     private void handleMedium(ActionEvent event) throws Exception {
-        // Show alert that Level 2 is not yet implemented
-        showLevelNotAvailableAlert("Level 2");
+        // For Level 2,  prompt for player count
+        int playerCount = promptForPlayerCount();
+        if (playerCount > 0) {
+            loadGame(event, "LEVEL 2", playerCount);
+        }
     }
     
     @FXML
