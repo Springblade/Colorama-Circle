@@ -175,6 +175,15 @@ public class GameController {
             rightContainer.getChildren().add(player4Container);
             playerBoards.add(player4Board);
         }
+        if (numberOfPlayers >= 5) {
+            // Player 5 (Next to the right of player 2)
+            PlayerBoard player5Board = new PlayerBoard(this);
+            player5Board.customizeOrientation(Orientation.VERTICAL);
+            player5Board.setPrefSize(120, sceneHeight * 0.4);
+            player5Board.setMaxSize(120, sceneWidth * 0.4);
+            VBox player5Container = createPlayerContainer(player5Board, "PLAYER 5", false);
+            
+        }
 
         leftContainer.setPadding(new Insets(0, 20, 0, 20));  // Horizontal
         rightContainer.setPadding(new Insets(0, 20, 0, 20)); // Horizontal 
