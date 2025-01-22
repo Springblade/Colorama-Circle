@@ -35,8 +35,8 @@ public class PlayerBoard extends FlowPane {
         this.setOrientation(orientation);
         
         if (orientation == Orientation.VERTICAL) {
-            // For vertical orientation, set preferred wrap length
-            this.setPrefWrapLength(40); // Adjust this value based on your piece size
+            // For vertical orientation
+            this.setPrefWrapLength(40); 
             this.setVgap(5);
             this.setHgap(2);
         } else {
@@ -124,7 +124,6 @@ public class PlayerBoard extends FlowPane {
     private void makeDraggable(Shape piece, Color color, ShapeType shapeType) {
         final Delta dragDelta = new Delta();
     
-        // Set up hover effect
         piece.setOnMouseEntered(e -> {
             if (isCurrentTurn) {
                 piece.setCursor(javafx.scene.Cursor.HAND);
@@ -144,15 +143,12 @@ public class PlayerBoard extends FlowPane {
                 return;
             }
     
-            // Record initial mouse position relative to piece's parent
             dragDelta.mouseX = event.getSceneX();
             dragDelta.mouseY = event.getSceneY();
     
-            // Record the initial position of the piece
             dragDelta.initialTranslateX = piece.getTranslateX();
             dragDelta.initialTranslateY = piece.getTranslateY();
     
-            // Visual feedback for dragging
             piece.setOpacity(0.7);
             piece.toFront();
             piece.setEffect(new DropShadow(8, Color.GOLD));
@@ -165,7 +161,6 @@ public class PlayerBoard extends FlowPane {
                 return;
             }
     
-            // Calculate the distance moved from the initial press
             double deltaX = event.getSceneX() - dragDelta.mouseX;
             double deltaY = event.getSceneY() - dragDelta.mouseY;
     
@@ -213,11 +208,6 @@ public class PlayerBoard extends FlowPane {
         this.isCurrentTurn = isCurrentTurn;
         if (isCurrentTurn) {
             this.setStyle("-fx-background-color: white; -fx-border-color: gold; -fx-border-width: 3;");
-            
-            // Trigger dice roll if the game is in Level 2
-            if ("LEVEL 2".equals(gameController.getDifficulty())) {
-                gameController.handleDiceRoll();
-            }
         } else {
             this.setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 2;");
         }
