@@ -26,7 +26,7 @@
             <menus>
                 <Menu text="Options">
                     <items>
-                        <MenuItem text="Close" onAction="#handleQuit"/>
+                        <MenuItem text="Quit" onAction="#handleQuit"/>
                     </items>
                 </Menu>
             </menus>
