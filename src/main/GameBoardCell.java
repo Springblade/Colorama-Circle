@@ -22,7 +22,6 @@ public class GameBoardCell extends StackPane {
     private Shape shapeNode;
     private String difficulty;
     private Shape piece;
-    private boolean disabled = false;
 
     public GameBoardCell(Color color, ShapeType shapeType, String difficulty) {
         this.color = color;
@@ -192,7 +191,6 @@ public class GameBoardCell extends StackPane {
         }
         // Mark the cell as permanently empty
         this.setDisable(true);
-        this.disabled = true;
     }
 
     public void highlightAsValidTarget() {
