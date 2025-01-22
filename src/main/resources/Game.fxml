@@ -20,7 +20,7 @@
         <top>
             <VBox alignment="CENTER" spacing="10">
                 <Label fx:id="diceRollResultLabel" 
-                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>    
                 <VBox fx:id="topContainer" alignment="CENTER" prefHeight="140">
                     <padding>
                         <Insets top="20" bottom="20" left="20" right="20"/>

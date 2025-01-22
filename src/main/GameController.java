@@ -35,6 +35,7 @@ public class GameController {
     @FXML private VBox farRightContainer;
     @FXML private Label diceRollResultLabel;
 
+
     private final int rows = 5;
     private final int cols = 8;
     private double sceneWidth = 800;
@@ -612,15 +613,19 @@ public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
                     if (isJoker || cell.matchesColor(rolledColor)) {
                         cell.removePiece();
                         if (isJoker) {
+                            String colorName = colorNames.get(rolledColor);
+                            diceRollResultLabel.setText("Picked " + colorName);
                             System.out.println("Picked correct piece (joker).");
                         } else {
                             String colorName = colorNames.get(rolledColor);
+                            diceRollResultLabel.setText("Picked correct color: " + colorName + ". Very good!");
                             System.out.println("Picked correct color: " + colorName);
                         }
                         checkGameEnd2();
                         removeHighlights();
                         nextTurn();
                     } else {
+                        String colorName = colorNames.get(rolledColor);
                         diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
                         System.out.println("Picked wrong color. Lose a turn.");
                         removeHighlights();
