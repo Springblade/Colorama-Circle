@@ -15,7 +15,12 @@ import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class DifficultyController {
     
@@ -43,7 +48,7 @@ public class DifficultyController {
     
     @FXML
     private void handleHard(ActionEvent event) throws Exception {
-        // Not available
+        // Not available yet
         showLevelNotAvailableAlert("LEVEL 3");
     }
     
@@ -107,7 +112,7 @@ public class DifficultyController {
 
         content.getChildren().addAll(titleLabel, instructionsLabel, playerInput, buttonBox);
 
-        // Add hover effects
+        // Hover effects
         confirmButton.setOnMouseEntered(e -> 
             confirmButton.setStyle(baseButtonStyle + "-fx-background-color: #45a049; -fx-text-fill: white;"));
         confirmButton.setOnMouseExited(e -> 
@@ -118,7 +123,6 @@ public class DifficultyController {
         cancelButton.setOnMouseExited(e -> 
             cancelButton.setStyle(baseButtonStyle + "-fx-background-color: #E74C3C; -fx-text-fill: white;"));
 
-        // Add validation to TextField
         playerInput.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 playerInput.setText(newValue.replaceAll("[^\\d]", ""));
@@ -149,30 +153,155 @@ public class DifficultyController {
         }
         return -1;
     }
-
     
+    private class PlayerInfo {
+        int playerNumber;
+        int age;
+    
+        PlayerInfo(int playerNumber, int age) {
+            this.playerNumber = playerNumber;
+            this.age = age;
+        }
+    }
+
+    private List<PlayerInfo> promptForPlayerAges(int playerCount) {
+        List<PlayerInfo> players = new ArrayList<>();
+        
+        for (int i = 1; i <= playerCount; i++) {
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Player " + i + " Age");
+    
+            VBox content = new VBox(40);
+            content.setAlignment(Pos.CENTER);
+            content.setPadding(new Insets(20));
+            content.setMinWidth(400);
+            content.setMinHeight(250);
+    
+            Label titleLabel = new Label("PLAYER " + i + " AGE");
+            titleLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+            
+            Label instructionsLabel = new Label("Enter age for Player " + i);
+            instructionsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #666666;");
+            
+            TextField ageInput = new TextField();
+            ageInput.setMaxWidth(200);
+            ageInput.setAlignment(Pos.CENTER);
+            ageInput.setStyle("-fx-font-size: 24px; -fx-padding: 10; " +
+                             "-fx-background-radius: 10; -fx-border-radius: 10; " +
+                             "-fx-border-color: #cccccc; -fx-border-width: 2;");
+    
+            HBox buttonBox = new HBox(30);
+            buttonBox.setAlignment(Pos.CENTER);
+            buttonBox.setPadding(new Insets(20, 0, 0, 0));
+            
+            Button confirmButton = new Button("CONFIRM");
+            Button cancelButton = new Button("CANCEL");
+            
+            String baseButtonStyle = "-fx-min-width: 120; -fx-max-width: 120; " +
+                                   "-fx-min-height: 40; -fx-max-height: 40; " +  
+                                   "-fx-font-size: 14px; -fx-font-weight: bold; " +
+                                   "-fx-background-radius: 20; -fx-cursor: hand; ";
+            
+            confirmButton.setStyle(baseButtonStyle + 
+                                 "-fx-background-color: #4CAF50; -fx-text-fill: white;");
+            cancelButton.setStyle(baseButtonStyle + 
+                                "-fx-background-color: #E74C3C; -fx-text-fill: white;");
+            
+            buttonBox.getChildren().addAll(confirmButton, cancelButton);
+            
+            confirmButton.setOnAction(e -> dialog.setResult("OK"));
+            cancelButton.setOnAction(e -> dialog.setResult("CANCEL"));
+    
+            // Add validation to TextField
+            ageInput.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*")) {
+                    ageInput.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            });
+    
+            content.getChildren().addAll(titleLabel, instructionsLabel, ageInput, buttonBox);
+            dialog.getDialogPane().setContent(content);
+            dialog.getDialogPane().getButtonTypes().clear();
+    
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent() && result.get().equals("OK")) {
+                try {
+                    int age = Integer.parseInt(ageInput.getText().trim());
+                    if (age > 0) {
+                        players.add(new PlayerInfo(i, age));
+                        continue;
+                    }
+                } catch (NumberFormatException ignored) {}
+                
+                // Show error for invalid age
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Invalid Age");
+                alert.setHeaderText(null);
+                alert.setContentText("Please enter a valid age.");
+                alert.showAndWait();
+                i--; // Retry this player
+            } else {
+                return null; // User cancelled
+            }
+        }
+        
+        return players;
+    }
+
     private void loadGame(ActionEvent event, String difficulty, int playerCount) throws Exception {
+        List<PlayerInfo> players = promptForPlayerAges(playerCount);
+        if (players == null) return;
+        
+        // Find all players with the youngest age
+        int youngestAge = players.stream()
+            .mapToInt(p -> p.age)
+            .min()
+            .orElseThrow();
+        
+        List<PlayerInfo> youngestPlayers = players.stream()
+            .filter(p -> p.age == youngestAge)
+            .collect(Collectors.toList());
+        
+        PlayerInfo startingPlayer;
+        if (youngestPlayers.size() > 1) {
+            // If there's a tie, show dialog to randomly select among youngest players
+            Alert tieAlert = new Alert(Alert.AlertType.INFORMATION);
+            tieAlert.setTitle("Age Tie");
+            tieAlert.setHeaderText("Multiple players are " + youngestAge + " years old!");
+            tieAlert.setContentText("A random selection will be made among the youngest players.");
+            tieAlert.showAndWait();
+        
+            // Randomly select one of the youngest players
+            Random random = new Random();
+            startingPlayer = youngestPlayers.get(random.nextInt(youngestPlayers.size()));
+            
+            // Show who was selected
+            Alert selectedAlert = new Alert(Alert.AlertType.INFORMATION);
+            selectedAlert.setTitle("Starting Player Selected");
+            selectedAlert.setHeaderText(null);
+            selectedAlert.setContentText("Player " + startingPlayer.playerNumber + " will start the game!");
+            selectedAlert.showAndWait();
+        } else {
+            startingPlayer = youngestPlayers.get(0);
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/Game.fxml"));
             Parent gameScreen = loader.load();
             
             GameController controller = loader.getController();
-            controller.initializeGame(difficulty, playerCount);
+            controller.initializeGame(difficulty, playerCount, startingPlayer.playerNumber - 1);
             
-            // Get the current window size
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene currentScene = stage.getScene();
             double width = currentScene.getWidth();
             double height = currentScene.getHeight();
             
-            // Create new scene with current dimensions
             Scene scene = new Scene(gameScreen, width, height);
             stage.setScene(scene);
-            
-            // Ensure maximized state is maintained
             stage.setMaximized(true);
             stage.show();
-            
+        
         } catch (Exception e) {
             showErrorAlert("Error Loading Game", "Failed to start the game. Please try again.");
             e.printStackTrace();
