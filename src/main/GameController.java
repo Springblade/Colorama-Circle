@@ -1,5 +1,6 @@
 package main;
 
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,17 +10,21 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label; 
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import java.util.*;
 
+import javafx.util.Duration;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -34,7 +39,7 @@ public class GameController {
     @FXML private VBox farLeftContainer; 
     @FXML private VBox farRightContainer;
     @FXML private Label diceRollResultLabel;
-
+    @FXML private Button rollButton;
 
     private final int rows = 5;
     private final int cols = 8;
@@ -50,7 +55,8 @@ public class GameController {
     private Random random = new Random();
     private Color rolledColor;
     private boolean isJoker = false;
-        
+    private boolean initialized = false;
+    //private Button rollButton;
 
     private Map<Color, String> colorNames = Map.of(
         Color.RED, "Red",
@@ -64,18 +70,16 @@ public class GameController {
         sceneHeight = 768;
     }
 
-    public void initializeGame(String difficulty, int playerCount) {
+    public void initializeGame(String difficulty, int playerCount, int startingPlayerIndex) {
         this.difficulty = difficulty;
         this.numberOfPlayers = playerCount;
-        
-        // Configure main layout
+        this.currentPlayer = startingPlayerIndex;
+
         mainLayout.setPadding(new Insets(20));
         
-        // Calculate optimal board size based on screen dimensions
         double minDimension = Math.min(sceneWidth * 0.7, sceneHeight * 0.7);
         double cellSize = Math.min(85, minDimension / Math.max(rows, cols));
         
-        // Configure board
         board.setAlignment(Pos.CENTER);
         board.setHgap(2);
         board.setVgap(2);
@@ -112,19 +116,39 @@ public class GameController {
         bottomContainer.setPadding(new Insets(10));
         leftContainer.setPadding(new Insets(10));
         rightContainer.setPadding(new Insets(10));
-        
 
-        // Initialize game based on difficulty and player count
-        if("LEVEL 1". equals(difficulty)){
+        if (rollButton != null) { 
+            if ("LEVEL 2".equals(difficulty)) {
+                rollButton.setVisible(true);
+                rollButton.setDisable(false);
+                
+                // Add hover effects
+                rollButton.setOnMouseEntered(e -> {
+                    if (!rollButton.isDisabled()) {
+                        rollButton.setStyle(rollButton.getStyle().replace("#4CAF50", "#45a049"));
+                    }
+                });
+                
+                rollButton.setOnMouseExited(e -> {
+                    if (!rollButton.isDisabled()) {
+                        rollButton.setStyle(rollButton.getStyle().replace("#45a049", "#4CAF50"));
+                    }
+                });
+            } else {
+                rollButton.setVisible(false);
+            }
+        }
+        
+        if ("LEVEL 1".equals(difficulty)) {
             generateEmptyGameBoard();
             initializePlayerBoards();
             distributePieces();
-        }
-
-        if (("LEVEL 2").equals(difficulty)) {
+        } else if ("LEVEL 2".equals(difficulty)) {
             generateFilledGameBoard();
             initializePlayerBoards();
-        }       
+        }
+        initialized = true;
+        playerBoards.get(currentPlayer).setCurrentTurn(true);
     }
 
     private void initializePlayerBoards() {
@@ -198,7 +222,6 @@ public class GameController {
             farRightContainer.getChildren().add(player6Container);
             playerBoards.add(player6Board);
         }
-        playerBoards.get(0).setCurrentTurn(true);
     }
 
     private VBox createPlayerContainer(PlayerBoard board, String playerLabel, boolean isTop) {
@@ -254,8 +277,6 @@ public class GameController {
 
     private void generateEmptyGameBoard() {
         board.getChildren().clear();
-        
-        // First set a fixed size for the board
         board.setPrefSize(cols * 65, rows * 65);
         board.setMinSize(cols * 65, rows * 65);
         
@@ -284,8 +305,6 @@ public class GameController {
 
     private void generateFilledGameBoard() {
         board.getChildren().clear();
-        
-        // First set a fixed size for the board
         board.setPrefSize(cols * 65, rows * 65);
         board.setMinSize(cols * 65, rows * 65);
         
@@ -307,7 +326,6 @@ public class GameController {
             }
         }
     
-        // Print debug info
         System.out.println("Generated board with " + board.getChildren().size() + " cells");
         System.out.println("Expected cells: " + (rows * cols));
     }
@@ -410,7 +428,6 @@ public class GameController {
             return false;
         }
     
-        // Convert scene coordinates to board coordinates
         Node boardNode = board;
         double localX = boardNode.sceneToLocal(sceneX, sceneY).getX();
         double localY = boardNode.sceneToLocal(sceneX, sceneY).getY();
@@ -437,41 +454,43 @@ public class GameController {
     }
 
     // LEVEL 2
-public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
-    // Convert scene coordinates to board coordinates
-    Node boardNode = board;
-    double localX = boardNode.sceneToLocal(sceneX, sceneY).getX();
-    double localY = boardNode.sceneToLocal(sceneX, sceneY).getY();
-
-    // Check if the pick location is within the board bounds
-    if (!board.getBoundsInLocal().contains(localX, localY)) {
-        return false;
-    }
-
-    // Find the cell at pick location
-    for (Node node : board.getChildren()) {
-        if (node instanceof GameBoardCell cell) {
-            if (cell.getBoundsInParent().contains(localX, localY)) {
-                // If rolledColor is null, allow picking any piece (joker case)
-                if (!cell.isEmpty() && (rolledColor == null || cell.matchesColor(rolledColor))) {
-                    cell.removePiece();
-                    checkGameEnd2(); // check if the game has ended
-                    nextTurn();
-                    return true;
-                } else {
-                    // Provide feedback for picking the wrong piece
-                    diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
-                    System.out.println("Picked wrong color. Lose a turn.");
-                    nextTurn();
-                    return false;
+    public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
+        Node boardNode = board;
+        double localX = boardNode.sceneToLocal(sceneX, sceneY).getX();
+        double localY = boardNode.sceneToLocal(sceneX, sceneY).getY();
+        // Check if the pick location is within the board bounds
+        if (!board.getBoundsInLocal().contains(localX, localY)) {
+            return false;
+        }
+    
+        // Find the cell at pick location
+        for (Node node : board.getChildren()) {
+            if (node instanceof GameBoardCell cell) {
+                if (cell.getBoundsInParent().contains(localX, localY)) {
+                    // If rolledColor is null, allow picking any piece (joker case)
+                    if (!cell.isEmpty() && (rolledColor == null || cell.matchesColor(rolledColor))) {
+                        cell.removePiece();
+                        checkGameEnd2();
+                        nextTurn();
+                        return true;
+                    } else {
+                        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
+                        System.out.println("Picked wrong color. Lose a turn.");
+                        nextTurn();
+                        return false;
+                    }
                 }
             }
         }
+        return false;
     }
-    return false;
-}
 
     private void nextTurn() {
+        // Enable the roll button for the next player
+        if (rollButton != null) {
+            rollButton.setDisable(false);
+        }
+        
         // End the current player's turn
         playerBoards.get(currentPlayer).setCurrentTurn(false);
         
@@ -481,14 +500,17 @@ public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
         // Start the next player's turn
         playerBoards.get(currentPlayer).setCurrentTurn(true);
         
-        // Update the visual style of the player boards
         for (int i = 0; i < playerBoards.size(); i++) {
             PlayerBoard board = playerBoards.get(i);
             board.setStyle("-fx-border-color: " + (i == currentPlayer ? "gold" : "#cccccc") + 
                           "; -fx-border-width: " + (i == currentPlayer ? "3" : "2") + ";");
         }
         
-    
+        // Reset the dice roll result label
+        if (diceRollResultLabel != null) {
+            diceRollResultLabel.setText("");
+        }
+        removeHighlights();
     }
 
     private void checkGameEnd1() {
@@ -507,11 +529,42 @@ public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
 
     private void showGameWonDialog1() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Congratulations!");
-        alert.setHeaderText("All pieces have been matched correctly!");
+        alert.setTitle("🎉 Level 1 Complete! 🎉");
+    
+        VBox contentBox = new VBox(15);
+        contentBox.setAlignment(Pos.CENTER);
+    
+        Label levelCompleteLabel = new Label("LEVEL 1 COMPLETE!");
+        levelCompleteLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+    
+        Label completionMessage = new Label("All Pieces Matched Successfully!");
+        completionMessage.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+    
+        VBox scoresBox = new VBox(5);
+        scoresBox.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5;");
+        scoresBox.setAlignment(Pos.CENTER_LEFT);
+    
+        Label scoresTitle = new Label("Scores:");
+        scoresTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+        scoresBox.getChildren().add(scoresTitle);
+    
+        int matchedPieces = 100; 
+        int totalPieces = 100;
+        Label scoreDetail = new Label(String.format("Matched Pieces: %d / %d", matchedPieces, totalPieces));
+        scoreDetail.setStyle("-fx-font-size: 14px; -fx-text-fill: #2C3E50;");
+        scoresBox.getChildren().add(scoreDetail);
+    
+        contentBox.getChildren().addAll(levelCompleteLabel, completionMessage, scoresBox);
+    
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #FFFFFF, #FFF8E7);");
+        dialogPane.setContent(contentBox);
+        dialogPane.setHeaderText(null);
+        dialogPane.setGraphic(null);
+    
         alert.showAndWait();
     }
-
+    
 
     private void checkGameEnd2() {
         boolean boardEmpty = true;
@@ -528,13 +581,78 @@ public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
     }
 
     private void showGameWonDialog2() {
+        int maxPieces = -1;
+        int winnerIndex = -1;
+        
+        for (int i = 0; i < playerBoards.size(); i++) {
+            int pieceCount = playerBoards.get(i).getChildren().size();
+            if (pieceCount > maxPieces) {
+                maxPieces = pieceCount;
+                winnerIndex = i;
+            }
+        }
+        
+        List<Integer> winners = new ArrayList<>();
+        for (int i = 0; i < playerBoards.size(); i++) {
+            if (playerBoards.get(i).getChildren().size() == maxPieces) {
+                winners.add(i + 1);
+            }
+        }
+        
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Congratulations!");
-        alert.setHeaderText("All pieces have been picked correctly!");
+        alert.setTitle("🎮 Game Over! 🎮");
+        
+        VBox contentBox = new VBox(15);
+        contentBox.setAlignment(Pos.CENTER);
+        
+        Label gameOverLabel = new Label("LEVEL 2 COMPLETE!");
+        gameOverLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+    
+        Label winnerLabel = new Label();
+        if (winners.size() > 1) {
+            winnerLabel.setText("DRAW!");
+        } else {
+            winnerLabel.setText("PLAYER " + (winnerIndex + 1) + " WINS!");
+        }
+        winnerLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+        
+        VBox scoresBox = new VBox(5);
+        scoresBox.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5;");
+        scoresBox.setAlignment(Pos.CENTER_LEFT);
+        
+        Label scoresTitle = new Label("Final Scores:");
+        scoresTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+        scoresBox.getChildren().add(scoresTitle);
+        
+        // Score bars
+        for (int i = 0; i < playerBoards.size(); i++) {
+            int pieceCount = playerBoards.get(i).getChildren().size();
+            
+            HBox playerScoreBox = new HBox(10);
+            playerScoreBox.setAlignment(Pos.CENTER_LEFT);
+            
+            Label playerLabel = new Label(String.format("Player %d:", i + 1));
+            Label scoreLabel = new Label(pieceCount + " pieces");
+            
+            if (pieceCount == maxPieces) {
+                playerLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+                scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+            }
+            
+            playerScoreBox.getChildren().addAll(playerLabel, scoreLabel);
+            scoresBox.getChildren().add(playerScoreBox);
+        }
+        
+        contentBox.getChildren().addAll(gameOverLabel, winnerLabel, scoresBox);
+        
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #FFFFFF, #FFF8E7);");
+        dialogPane.setContent(contentBox);
+        dialogPane.setHeaderText(null);
+        dialogPane.setGraphic(null);
+        
         alert.showAndWait();
     }
-
-
 
     @FXML
     private void handleNewGame() {
@@ -585,71 +703,114 @@ public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
         }
     }
 
-    public void handleDiceRoll() {
-    int roll = random.nextInt(6); // Simulate a dice roll (0-5)
-    rolledColor = null;
-    isJoker = false; // Reset isJoker at the start of each dice roll
+    private boolean checkColorAvailable(Color color) {
+        for (Node node : board.getChildren()) {
+            if (node instanceof GameBoardCell cell) {
+                if (!cell.isEmpty() && cell.matchesColor(color)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-    switch (roll) {
-        case 0, 1, 2, 3 -> {
+    public void handleDiceRoll() {
+        rollButton.setDisable(true);
+        
+        int roll = random.nextInt(6);
+        rolledColor = null;
+        isJoker = false;
+       
+        diceRollResultLabel.setVisible(true);
+        diceRollResultLabel.setManaged(true);
+        diceRollResultLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        VBox topBox = (VBox) mainLayout.getTop();
+        if (!topBox.getChildren().contains(diceRollResultLabel)) {
+            topBox.getChildren().add(0, diceRollResultLabel);
+        }
+        BorderPane.setAlignment(topBox, Pos.CENTER);
+        BorderPane.setMargin(topBox, new Insets(20, 0, 0, 0));
+    
+        if (roll < 4) {
             rolledColor = colors[roll];
             String colorName = colorNames.get(rolledColor);
+            
+            // Check if the rolled color is available
+            if (!checkColorAvailable(rolledColor)) {
+                diceRollResultLabel.setText("No " + colorName + " pieces available. Skipping turn.");
+                System.out.println("No " + colorName + " pieces available. Skipping turn.");
+                PauseTransition pause = new PauseTransition(Duration.seconds(3));
+                pause.setOnFinished(e -> nextTurn());
+                pause.play();
+                return;
+            }
+            
             diceRollResultLabel.setText("Rolled color: " + colorName);
             System.out.println("Rolled color: " + colorName);
-        }
-        case 4 -> {
+        } else if (roll == 4) {
             diceRollResultLabel.setText("Rolled blank. Lose a turn.");
             System.out.println("Rolled blank. Lose a turn.");
-            nextTurn();
+            PauseTransition pause = new PauseTransition(Duration.seconds(3));
+            pause.setOnFinished(e -> nextTurn());
+            pause.play();
             return;
-        }
-        case 5 -> {
+        } else if (roll == 5) {
+            // Check if there are any pieces left at all
+            boolean anyPiecesLeft = false;
+            for (Color color : colors) {
+                if (checkColorAvailable(color)) {
+                    anyPiecesLeft = true;
+                    break;
+                }
+            }
+            
+            if (!anyPiecesLeft) {
+                diceRollResultLabel.setText("No pieces left to pick. Game Over!");
+                System.out.println("No pieces left to pick. Game Over!");
+                showGameWonDialog2();
+                return;
+            }
+            
             isJoker = true;
             diceRollResultLabel.setText("Rolled lucky joker. Pick any piece.");
             System.out.println("Rolled lucky joker. Pick any piece.");
         }
-    }
-
-    //Allow player to pick a piece based on the rolled color or joker
     
-    for (GameBoardCell cell : getAllCells()) {
-        if (isJoker || cell.matchesColor(rolledColor) || !cell.isDisabled()) {
-            cell.setOnMouseClicked(e -> handleCellClick(cell));
-
-        } else {
-            cell.setOnMouseClicked(null); // Disable click event for cells that don't match
+        for (GameBoardCell cell : getAllCells()) {
+            cell.setOnMouseClicked(null);
+            
+            if (isJoker || cell.matchesColor(rolledColor)) {
+                cell.highlightAsValidTarget();
+                cell.setOnMouseClicked(e -> {
+                    if (!cell.isEmpty() && (isJoker || cell.matchesColor(rolledColor))) {
+                        Color pieceColor = cell.getColor();
+                        ShapeType pieceShape = cell.getShapeType();
+                        cell.removePiece();
+                        PlayerBoard currentPlayerBoard = playerBoards.get(currentPlayer);
+                        currentPlayerBoard.addPiece(pieceColor, pieceShape);
+                        
+                        if (isJoker) {
+                            System.out.println("Picked correct piece (joker).");
+                        } else {
+                            String colorName = colorNames.get(rolledColor);
+                            System.out.println("Picked correct color: " + colorName);
+                        }
+                        
+                        checkGameEnd2();
+                        removeHighlights();
+                        nextTurn();
+                    } else {
+                        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
+                        System.out.println("Picked wrong color. Lose a turn.");
+                        removeHighlights();
+                        nextTurn();
+                    }
+                });
+            }
         }
     }
-}
 
-
-
-private void handleCellClick(GameBoardCell cell) {
-    String colorName = colorNames.get(rolledColor);
-    if (!cell.isEmpty() && isJoker){
-        cell.removePiece();
-        diceRollResultLabel.setText("Picked any piece (joker).");
-        System.out.println("Picked any piece (joker).");
-        cell.removePiece();
-        checkGameEnd2();
-        nextTurn();
-    }
-    else if(!cell.isEmpty() && cell.matchesColor(rolledColor)){
-        diceRollResultLabel.setText("Picked correct color: " + colorName + ". Very good!");
-        System.out.println("Picked correct color: " + colorName);
-        cell.removePiece();
-        checkGameEnd2();
-        nextTurn();
-    }
-    else if(!cell.isEmpty() && !cell.matchesColor(rolledColor)){
-        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
-        System.out.println("Picked wrong color. Lose a turn.");
-        nextTurn();
-    }
-}
-
-
-private List<GameBoardCell> getAllCells() {
+    private List<GameBoardCell> getAllCells() {
         List<GameBoardCell> cells = new ArrayList<>();
         for (Node node : board.getChildren()) {
             if (node instanceof GameBoardCell) {
@@ -663,8 +824,6 @@ private List<GameBoardCell> getAllCells() {
         return difficulty;
     }
 
-  
-
     public Color getRolledColor() {
         return rolledColor;
     }
@@ -675,4 +834,7 @@ private List<GameBoardCell> getAllCells() {
         }
     }
 
+    public boolean isInitialized() {
+        return initialized;
+    }
 }
