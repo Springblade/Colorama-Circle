@@ -2,6 +2,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.*?>
+<?import javafx.scene.effect.DropShadow?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="main.GameController">
    
@@ -20,7 +21,9 @@
         <top>
             <VBox alignment="CENTER" spacing="10">
                 <Label fx:id="diceRollResultLabel" 
-                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>    
+                       visible="false"
+                       managed="false"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
                 <VBox fx:id="topContainer" alignment="CENTER" prefHeight="140">
                     <padding>
                         <Insets top="20" bottom="20" left="20" right="20"/>
@@ -93,5 +96,33 @@
                 </BorderPane.margin>
             </VBox>
         </bottom>
+
+        <right>
+            <AnchorPane>
+                <children>
+                    <Button fx:id="rollButton" 
+                            text="ROLL"
+                            onAction="#handleDiceRoll"
+                            style="-fx-min-width: 100; 
+                                   -fx-min-height: 40;
+                                   -fx-background-color: #4CAF50;
+                                   -fx-text-fill: white;
+                                   -fx-font-size: 16px;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 20;
+                                   -fx-cursor: hand;">
+                        <effect>
+                            <DropShadow radius="5.0"
+                                       spread="0.1"
+                                       offsetX="2.0"
+                                       offsetY="2.0"
+                                       color="rgba(0,0,0,0.3)"/>
+                        </effect>
+                        <AnchorPane.bottomAnchor>80.0</AnchorPane.bottomAnchor>
+                        <AnchorPane.rightAnchor>40.0</AnchorPane.rightAnchor>
+                    </Button>
+                </children>
+            </AnchorPane>
+        </right>
     </BorderPane>
 </VBox>
