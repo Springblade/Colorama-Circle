@@ -176,7 +176,6 @@ public class GameController {
             rightContainer.getChildren().add(player4Container);
             playerBoards.add(player4Board);
         }
-<<<<<<< HEAD
     
         if (numberOfPlayers >= 5) {
             // Player 5 (Far left)
@@ -199,20 +198,6 @@ public class GameController {
             farRightContainer.getChildren().add(player6Container);
             playerBoards.add(player6Board);
         }
-=======
-
-        leftContainer.setPadding(new Insets(0, 20, 0, 20));  // Horizontal
-        rightContainer.setPadding(new Insets(0, 20, 0, 20)); // Horizontal 
-        topContainer.setPadding(new Insets(20, 0, 20, 0));   // Vertical 
-        bottomContainer.setPadding(new Insets(20, 0, 20, 0)); // Vertical
-        
-        leftContainer.setPrefWidth(sceneWidth * 0.2);   
-        rightContainer.setPrefWidth(sceneWidth * 0.2);  
-        topContainer.setPrefHeight(sceneHeight * 0.2);  
-        bottomContainer.setPrefHeight(sceneHeight * 0.2); 
-
-        // Set initial turn
->>>>>>> parent of 1738978 (Update makeDraggble, update player 5 and 6, update GUI and update difficulty level)
         playerBoards.get(0).setCurrentTurn(true);
     }
 
