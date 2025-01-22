@@ -74,7 +74,6 @@ public class PlayerBoard extends FlowPane {
 
     private Shape createShape(ShapeType shapeType) {
         double baseSize = 40;
-        
         switch (shapeType) {
             case CIRCLE:
                 Circle circle = new Circle(baseSize / 2);

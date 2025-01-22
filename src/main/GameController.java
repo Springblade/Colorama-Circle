@@ -438,38 +438,39 @@ public class GameController {
 
     // LEVEL 2
 public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
-        // Convert scene coordinates to board coordinates
-        Node boardNode = board;
-        double localX = boardNode.sceneToLocal(sceneX, sceneY).getX();
-        double localY = boardNode.sceneToLocal(sceneX, sceneY).getY();
-    
-        // Check if the pick location is within the board bounds
-        if (!board.getBoundsInLocal().contains(localX, localY)) {
-            return false;
-        }
-    
-        // Find the cell at pick location
-        for (Node node : board.getChildren()) {
-            if (node instanceof GameBoardCell cell) {
-                if (cell.getBoundsInParent().contains(localX, localY)) {
-                    // If rolledColor is null, allow picking any piece (joker case)
-                    if (!cell.isEmpty() && (rolledColor == null || cell.matchesColor(rolledColor))) {
-                        cell.removePiece();
-                        checkGameEnd2(); // check if the game has ended
-                        nextTurn();
-                        return true;
-                    } else {
-                        // Provide feedback for picking the wrong piece
-                        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
-                        System.out.println("Picked wrong color. Lose a turn.");
-                        nextTurn();
-                        return false;
-                    }
+    // Convert scene coordinates to board coordinates
+    Node boardNode = board;
+    double localX = boardNode.sceneToLocal(sceneX, sceneY).getX();
+    double localY = boardNode.sceneToLocal(sceneX, sceneY).getY();
+
+    // Check if the pick location is within the board bounds
+    if (!board.getBoundsInLocal().contains(localX, localY)) {
+        return false;
+    }
+
+    // Find the cell at pick location
+    for (Node node : board.getChildren()) {
+        if (node instanceof GameBoardCell cell) {
+            if (cell.getBoundsInParent().contains(localX, localY)) {
+                // If rolledColor is null, allow picking any piece (joker case)
+                if (!cell.isEmpty() && (rolledColor == null || cell.matchesColor(rolledColor))) {
+                    cell.removePiece();
+                    checkGameEnd2(); // check if the game has ended
+                    nextTurn();
+                    return true;
+                } else {
+                    // Provide feedback for picking the wrong piece
+                    diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
+                    System.out.println("Picked wrong color. Lose a turn.");
+                    nextTurn();
+                    return false;
                 }
             }
         }
-        return false;
     }
+    return false;
+}
+
     private void nextTurn() {
         // End the current player's turn
         playerBoards.get(currentPlayer).setCurrentTurn(false);
@@ -585,58 +586,70 @@ public boolean tryPickPiece(double sceneX, double sceneY, Color rolledColor) {
     }
 
     public void handleDiceRoll() {
-        int roll = random.nextInt(6); // Simulate a dice roll (0-5)
-        rolledColor = null;
-        isJoker = false; // Reset isJoker at the start of each dice roll
+    int roll = random.nextInt(6); // Simulate a dice roll (0-5)
+    rolledColor = null;
+    isJoker = false; // Reset isJoker at the start of each dice roll
 
-        if (roll < 4) {
+    switch (roll) {
+        case 0, 1, 2, 3 -> {
             rolledColor = colors[roll];
             String colorName = colorNames.get(rolledColor);
             diceRollResultLabel.setText("Rolled color: " + colorName);
             System.out.println("Rolled color: " + colorName);
-        } else if (roll == 4) {
+        }
+        case 4 -> {
             diceRollResultLabel.setText("Rolled blank. Lose a turn.");
             System.out.println("Rolled blank. Lose a turn.");
             nextTurn();
             return;
-        } else if (roll == 5) {
+        }
+        case 5 -> {
             isJoker = true;
             diceRollResultLabel.setText("Rolled lucky joker. Pick any piece.");
             System.out.println("Rolled lucky joker. Pick any piece.");
         }
-
-        // Allow player to pick a piece based on the rolled color or joker
-        for (GameBoardCell cell : getAllCells()) {
-            if (isJoker || cell.matchesColor(rolledColor)) {
-                cell.highlightAsValidTarget();
-                cell.setOnMouseClicked(e -> {
-                    if (isJoker || cell.matchesColor(rolledColor)) {
-                        cell.removePiece();
-                        if (isJoker) {
-                            String colorName = colorNames.get(rolledColor);
-                            diceRollResultLabel.setText("Picked " + colorName);
-                            System.out.println("Picked correct piece (joker).");
-                        } else {
-                            String colorName = colorNames.get(rolledColor);
-                            diceRollResultLabel.setText("Picked correct color: " + colorName + ". Very good!");
-                            System.out.println("Picked correct color: " + colorName);
-                        }
-                        checkGameEnd2();
-                        removeHighlights();
-                        nextTurn();
-                    } else {
-                        String colorName = colorNames.get(rolledColor);
-                        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
-                        System.out.println("Picked wrong color. Lose a turn.");
-                        removeHighlights();
-                        nextTurn();
-                    }
-                });
-            }
-        }
     }
 
-  private List<GameBoardCell> getAllCells() {
+    //Allow player to pick a piece based on the rolled color or joker
+    
+    for (GameBoardCell cell : getAllCells()) {
+        if (isJoker || cell.matchesColor(rolledColor) || !cell.isDisabled()) {
+            cell.setOnMouseClicked(e -> handleCellClick(cell));
+
+        } else {
+            cell.setOnMouseClicked(null); // Disable click event for cells that don't match
+        }
+    }
+}
+
+
+
+private void handleCellClick(GameBoardCell cell) {
+    String colorName = colorNames.get(rolledColor);
+    if (!cell.isEmpty() && isJoker){
+        cell.removePiece();
+        diceRollResultLabel.setText("Picked any piece (joker).");
+        System.out.println("Picked any piece (joker).");
+        cell.removePiece();
+        checkGameEnd2();
+        nextTurn();
+    }
+    else if(!cell.isEmpty() && cell.matchesColor(rolledColor)){
+        diceRollResultLabel.setText("Picked correct color: " + colorName + ". Very good!");
+        System.out.println("Picked correct color: " + colorName);
+        cell.removePiece();
+        checkGameEnd2();
+        nextTurn();
+    }
+    else if(!cell.isEmpty() && !cell.matchesColor(rolledColor)){
+        diceRollResultLabel.setText("Picked wrong color. Lose a turn.");
+        System.out.println("Picked wrong color. Lose a turn.");
+        nextTurn();
+    }
+}
+
+
+private List<GameBoardCell> getAllCells() {
         List<GameBoardCell> cells = new ArrayList<>();
         for (Node node : board.getChildren()) {
             if (node instanceof GameBoardCell) {
