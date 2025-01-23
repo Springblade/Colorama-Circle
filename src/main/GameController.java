@@ -146,9 +146,16 @@ public class GameController {
         } else if ("LEVEL 2".equals(difficulty)) {
             generateFilledGameBoard();
             initializePlayerBoards();
+            disableBoardCells();
         }
         initialized = true;
         playerBoards.get(currentPlayer).setCurrentTurn(true);
+    }
+
+    private void disableBoardCells() {
+        for (GameBoardCell cell : getAllCells()) {
+            cell.setDisable(true);
+        }
     }
 
     private void initializePlayerBoards() {
@@ -664,15 +671,9 @@ public class GameController {
     
         currentPlayer = 0;
         playerBoards.clear();
-    
-        if ("LEVEL 1".equals(difficulty)) {
-            generateEmptyGameBoard();
-            initializePlayerBoards();
-            distributePieces();
-        } else if ("LEVEL 2".equals(difficulty)) {
-            generateFilledGameBoard();
-            initializePlayerBoards();
-        }
+
+        // Reinitialize the game with the same difficulty and number of players
+        initializeGame(difficulty, numberOfPlayers, currentPlayer);
     }
 
     @FXML
@@ -777,6 +778,7 @@ public class GameController {
         }
     
         for (GameBoardCell cell : getAllCells()) {
+            cell.setDisable(false);
             cell.setOnMouseClicked(null);
             
             if (isJoker || cell.matchesColor(rolledColor)) {

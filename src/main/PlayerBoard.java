@@ -121,7 +121,7 @@ public class PlayerBoard extends FlowPane {
         }
     }
 
-    private void makeDraggable(Shape piece, Color color, ShapeType shapeType) {
+    public void makeDraggable(Shape piece, Color color, ShapeType shapeType) {
         final Delta dragDelta = new Delta();
     
         piece.setOnMouseEntered(e -> {
@@ -202,6 +202,26 @@ public class PlayerBoard extends FlowPane {
             piece.setEffect(new DropShadow(4, Color.gray(0.3, 0.5)));
             event.consume();
         });
+    }
+
+    public ShapeType getShapeType(Shape piece) {
+        if (piece instanceof Circle) {
+            return ShapeType.CIRCLE;
+        } else if (piece instanceof Rectangle) {
+            return ShapeType.SQUARE;
+        } else if (piece instanceof Polygon) {
+            Polygon polygon = (Polygon) piece;
+            int sides = polygon.getPoints().size() / 2;
+            switch (sides) {
+                case 3:
+                    return ShapeType.TRIANGLE;
+                case 6:
+                    return ShapeType.HEXAGON;
+                default:
+                    return ShapeType.TRAPEZOID;
+            }
+        }
+        return ShapeType.CIRCLE; // Default case
     }
     
     public void setCurrentTurn(boolean isCurrentTurn) {
