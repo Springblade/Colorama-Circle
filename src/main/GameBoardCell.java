@@ -46,8 +46,6 @@ public class GameBoardCell extends StackPane {
 
         shapeNode = difficulty.equals("LEVEL 1") ? createEmptyCell() : createFilledCell();
         getChildren().add(shapeNode);
-
-        // Set up mouse interactions
         setupMouseHandlers();
     }
 
@@ -261,7 +259,6 @@ public class GameBoardCell extends StackPane {
         return shapeType;
     }
 
-    // Method to check if the color of the cell and the rolled color match
     public boolean matchesColor(Color rolledColor) {
         return this.color.equals(rolledColor);
     }
