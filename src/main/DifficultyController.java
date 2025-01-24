@@ -239,9 +239,9 @@ public class DifficultyController {
                 alert.setHeaderText(null);
                 alert.setContentText("Please enter a valid age.");
                 alert.showAndWait();
-                i--; // Retry this player
+                i--; 
             } else {
-                return null; // User cancelled
+                return null; 
             }
         }
         
@@ -314,13 +314,11 @@ public class DifficultyController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/StartScreen.fxml"));
             Parent startScreen = loader.load();
             
-            // Get the current window size
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene currentScene = stage.getScene();
             double width = currentScene.getWidth();
             double height = currentScene.getHeight();
             
-            // Create new scene with current dimensions
             Scene scene = new Scene(startScreen, width, height);
             stage.setScene(scene);
             stage.setMaximized(true);
