@@ -250,34 +250,76 @@ public class GameController {
     private void distributePieces() {
         List<GamePiece> allPieces = new ArrayList<>();
         
-        int piecesPerCombo = switch(difficulty) {
-            case "LEVEL 1" -> 2;
-            case "LEVEL 2" -> 3;
-            case "LEVEL 3" -> 4;
-            default -> 2;
-        };
-
+        // Create all possible piece combinations
         for (Color color : colors) {
             for (ShapeType shape : shapes) {
-                for (int i = 0; i < piecesPerCombo; i++) {
+                for (int i = 0; i < 2; i++) { 
                     allPieces.add(new GamePiece(color, shape));
                 }
             }
         }
-
+    
         Collections.shuffle(allPieces);
-
-        int totalPieces = allPieces.size();
-        int piecesPerPlayer = totalPieces / numberOfPlayers;
-
+        
+        // Calculate pieces per player and leftover pieces based on number of players
+        int totalPieces = allPieces.size(); 
+        int piecesPerPlayer;
+        int leftoverPieces;
+        
+        switch (numberOfPlayers) {
+            case 1:
+                piecesPerPlayer = 40;
+                leftoverPieces = 0;
+                break;
+            case 2:
+                piecesPerPlayer = 20;
+                leftoverPieces = 0;
+                break;
+            case 3:
+                piecesPerPlayer = 13;
+                leftoverPieces = 1;
+                break;
+            case 4:
+                piecesPerPlayer = 10;
+                leftoverPieces = 0;
+                break;
+            case 5:
+                piecesPerPlayer = 8;
+                leftoverPieces = 0;
+                break;
+            case 6:
+                piecesPerPlayer = 6;
+                leftoverPieces = 4;
+                break;
+            default:
+                throw new IllegalStateException("Unsupported number of players: " + numberOfPlayers);
+        }
+    
+        // Distribute pieces to players
         for (int i = 0; i < numberOfPlayers; i++) {
             PlayerBoard board = playerBoards.get(i);
             int startIndex = i * piecesPerPlayer;
-            int endIndex = Math.min(startIndex + piecesPerPlayer, totalPieces);
+            int endIndex = startIndex + piecesPerPlayer;
             
             for (int j = startIndex; j < endIndex; j++) {
                 GamePiece piece = allPieces.get(j);
                 board.addPiece(piece.getColor(), piece.getShape());
+            }
+        }
+    
+        // Place leftover pieces on the board if any
+        if (leftoverPieces > 0) {
+            int startIndex = numberOfPlayers * piecesPerPlayer;
+            for (int i = 0; i < leftoverPieces; i++) {
+                GamePiece piece = allPieces.get(startIndex + i);
+                // Find an empty cell to place the leftover piece
+                for (Node node : board.getChildren()) {
+                    if (node instanceof GameBoardCell cell && cell.isEmpty() && 
+                        cell.matches(piece)) {
+                        cell.placePiece(piece);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -838,5 +880,9 @@ public class GameController {
 
     public boolean isInitialized() {
         return initialized;
+    }
+    public void TestWinner() {
+        showGameWonDialog1();
+        showGameWonDialog2();
     }
 }
