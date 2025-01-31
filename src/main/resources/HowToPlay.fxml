@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" 
+           fx:controller="main.HowToPlayController"
+           prefWidth="800" 
+           prefHeight="550"
+           style="-fx-background-color: linear-gradient(to bottom right, #FFFFFF, #FFF8E7);">
+
+    <VBox spacing="20" alignment="TOP_CENTER" maxWidth="800">
+        <Label text="How To Play Colorama" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+        
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
+            <VBox spacing="15">
+                <Label text="Skill Level 1: Discovering Colors and Shapes" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                <Label text="- For 1-6 players, ages 3+" style="-fx-font-size: 16px;"/>
+                <Label text="- Objective: Match all playing pieces to the game board by finding a space for every shape and color" style="-fx-font-size: 16px;"/>
+                <Label text="+ Getting Started:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="  - Mix up the pieces and hand an even amount to each player" style="-fx-font-size: 16px;"/>
+                <Label text="  - The color and shape of the pieces are not important" style="-fx-font-size: 16px;"/>
+                <Label text="  - Place any leftover pieces in their matching spaces on the game board" style="-fx-font-size: 16px;"/>
+                <Label text="+ How to Play:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="  - The youngest player goes first" style="-fx-font-size: 16px;"/>
+                <Label text="  - Players take turns placing their colorful shapes in matching spaces on the board" style="-fx-font-size: 16px;"/>
+                <Label text="+ Winning the Game:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="  - The game is over when each piece has found its matching space and the board is full of vibrant shapes and colors" style="-fx-font-size: 16px;"/>
+                <Label text="  - Everybody wins!" style="-fx-font-size: 16px;"/>
+
+                <Label text="Skill Level 2: Discovering the Dice" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #FFA500;"/>
+                <Label text="- For 2-6 players, ages 4+" style="-fx-font-size: 16px;"/>
+                <Label text="- Objective: Collect pieces by rolling the dice" style="-fx-font-size: 16px;"/>
+                <Label text="+ Getting Started:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="  - Set aside the shape die and only use the color die" style="-fx-font-size: 16px;"/>
+                <Label text="  - Start by putting all the shapes in their matching spaces on the game board" style="-fx-font-size: 16px;"/>
+                <Label text="+ How to Play:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="  - The youngest player goes first" style="-fx-font-size: 16px;"/>
+                <Label text="  - Roll the color die and pick up any playing piece of the same color from the board" style="-fx-font-size: 16px;"/>
+                <Label text="  - The lucky Joker lets you choose whatever color shape you like" style="-fx-font-size: 16px;"/>
+                <Label text="  - If you roll a blank, you miss a turn" style="-fx-font-size: 16px;"/>
+                <Label text="  - If you roll a color that has no matching pieces left, you miss a turn" style="-fx-font-size: 16px;"/>
+                <Label text="+ Winning the Game:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="  - When there are no more pieces left on the game board, the game is over" style="-fx-font-size: 16px;"/>
+                <Label text="  - Everyone count your shapes! Whoever has the most is the winner." style="-fx-font-size: 16px;"/>
+                <Label text="+ Game Variations:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="  - Use the shape die instead of the color die. Only pick up pieces that match the shapes you roll." style="-fx-font-size: 16px;"/>
+            </VBox>
+        </ScrollPane>
+
+        <Button text="BACK" onAction="#handleBackButton" />
+    </VBox>
+</StackPane>
