@@ -18,7 +18,7 @@
         <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
             <VBox spacing="15">
                 <Label text="Skill Level 1: Discovering Colors and Shapes" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
-                <Label text="- For 1-6 players, ages 3+" style="-fx-font-size: 16px;"/>
+                <Label text="- For 1-6 players" style="-fx-font-size: 16px;"/>
                 <Label text="- Objective: Match all playing pieces to the game board by finding a space for every shape and color" style="-fx-font-size: 16px;"/>
                 <Label text="+ Getting Started:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 <Label text="  - Mix up the pieces and hand an even amount to each player" style="-fx-font-size: 16px;"/>
@@ -32,7 +32,7 @@
                 <Label text="  - Everybody wins!" style="-fx-font-size: 16px;"/>
 
                 <Label text="Skill Level 2: Discovering the Dice" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #FFA500;"/>
-                <Label text="- For 2-6 players, ages 4+" style="-fx-font-size: 16px;"/>
+                <Label text="- For 2-6 players" style="-fx-font-size: 16px;"/>
                 <Label text="- Objective: Collect pieces by rolling the dice" style="-fx-font-size: 16px;"/>
                 <Label text="+ Getting Started:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 <Label text="  - Set aside the shape die and only use the color die" style="-fx-font-size: 16px;"/>
@@ -46,8 +46,6 @@
                 <Label text="+ Winning the Game:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 <Label text="  - When there are no more pieces left on the game board, the game is over" style="-fx-font-size: 16px;"/>
                 <Label text="  - Everyone count your shapes! Whoever has the most is the winner." style="-fx-font-size: 16px;"/>
-                <Label text="+ Game Variations:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-                <Label text="  - Use the shape die instead of the color die. Only pick up pieces that match the shapes you roll." style="-fx-font-size: 16px;"/>
             </VBox>
         </ScrollPane>
 
